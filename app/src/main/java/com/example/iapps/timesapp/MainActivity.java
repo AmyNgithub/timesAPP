@@ -1,6 +1,7 @@
 package com.example.iapps.timesapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -76,7 +77,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     @Override
     public final void onSensorChanged(SensorEvent event) {
-
+        //Intent i = new Intent(getApplicationContext(), RotationActivity.class);
         if(event.sensor.getType() == Sensor.TYPE_GRAVITY){
             float axisz = event.values[2];
             float sum = event.values[0] + event.values[1] + event.values[2];
@@ -85,6 +86,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             if(Math.abs(axisz - sum) < offset){
                 if(axisz > 0){
                     infoView.setText("On table");
+                    //startActivity(i);
                 }else{
                     infoView.setText("Upside down");
                 }
