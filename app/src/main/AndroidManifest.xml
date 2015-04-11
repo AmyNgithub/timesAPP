@@ -20,7 +20,10 @@
             android:name=".RotationActivity"
             android:label="@string/title_activity_rotation" >
         </activity>
-
+        <activity
+            android:name=".RotationActivity2"
+            android:label="@string/title_activity_rotation_activity2" >
+        </activity>
     </application>
 
 </manifest>

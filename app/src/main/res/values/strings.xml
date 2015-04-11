@@ -6,4 +6,5 @@
 
     <string name="hello_world">Rotation done here!</string>
     <string name="title_activity_rtation">RotationActivity</string>
+    <string name="title_activity_rotation_activity2">RotationActivity2</string>
 </resources>
