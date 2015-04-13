@@ -13,38 +13,39 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 
-public class MainActivity extends ActionBarActivity implements SensorEventListener {
-    private TextView infoView;
+public class GyroRotationActivity extends ActionBarActivity implements SensorEventListener {
+    private TextView rotationView;
     private SensorManager mSensorManager;
-    private Sensor mGravity;
+    private Sensor mGyro;
 
-
-    //All kod från: http://developer.android.com/guide/topics/sensors/sensors_overview.html
+    private static final float NS2S = 1.0f / 1000000000.0f; //Convert nanoseconds to seconds
+    private float timestamp = 0; // Last timestamp, needed for integration
+    private float totalRotation = 0; //Total rotation so far
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_gyro_rotation);
 
-        infoView = (TextView) findViewById(R.id.info_view);
-        infoView.setText("Not on table");
+        rotationView = (TextView) findViewById(R.id.gyro_rot_view);
+        rotationView.setText("Not changed");
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        if (mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null){
+        if (mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) != null){
             // Success! There's a gravity sensor.
-            mGravity = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+            mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         }
         else {
             // Failure! No gravity sensor.
+            rotationView.setText("No gyro found");
         }
-
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_gyro_rotation, menu);
         return true;
     }
 
@@ -70,23 +71,19 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     @Override
     public final void onSensorChanged(SensorEvent event) {
-        Intent i = new Intent(getApplicationContext(), GyroRotationActivity.class);
-        if(event.sensor.getType() == Sensor.TYPE_GRAVITY) {
-            float axisz = event.values[2];
-            float sum = event.values[0] + event.values[1] + event.values[2];
-            float offset = 0.5f;
-
-            if (Math.abs(axisz - sum) < offset) {
-                if (axisz > 0) {
-                    infoView.setText("On table");
-                    startActivity(i);
-                } else {
-                    infoView.setText("Upside down");
+        if(event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+            if(timestamp != 0) {
+                float dT = (event.timestamp - timestamp) * NS2S;
+                float deltaRotation = event.values[2]*dT;
+                //Kanske en if sats här
+                if(event.values[2] > 0.1f || event.values[2] < -0.1f){
+                    totalRotation += deltaRotation;
+                    rotationView.setText(String.valueOf(Math.round(Math.toDegrees(totalRotation))));
                 }
-
-            } else {
-                infoView.setText("Not on table");
             }
+
+            // measurement done, save current time for next interval
+            timestamp = event.timestamp;
         }
 
     }
@@ -94,7 +91,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     @Override
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mGravity, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mGyro, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @Override

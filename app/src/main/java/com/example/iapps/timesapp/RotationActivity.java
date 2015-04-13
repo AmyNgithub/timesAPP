@@ -101,7 +101,7 @@ public class RotationActivity extends ActionBarActivity implements SensorEventLi
     @Override
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mRotation, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mRotation, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @Override

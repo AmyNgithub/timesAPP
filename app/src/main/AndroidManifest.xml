@@ -24,6 +24,10 @@
             android:name=".RotationActivity2"
             android:label="@string/title_activity_rotation_activity2" >
         </activity>
+        <activity
+            android:name=".GyroRotationActivity"
+            android:label="@string/title_activity_gyro_rotation" >
+        </activity>
     </application>
 
 </manifest>
