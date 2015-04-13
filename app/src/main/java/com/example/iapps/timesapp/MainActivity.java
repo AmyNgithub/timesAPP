@@ -70,7 +70,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     @Override
     public final void onSensorChanged(SensorEvent event) {
-        Intent i = new Intent(getApplicationContext(), RotationActivity.class);
+        Intent i = new Intent(getApplicationContext(), RotationActivity2.class);
         if(event.sensor.getType() == Sensor.TYPE_GRAVITY) {
             float axisz = event.values[2];
             float sum = event.values[0] + event.values[1] + event.values[2];

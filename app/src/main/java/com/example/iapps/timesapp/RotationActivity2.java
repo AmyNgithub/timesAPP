@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -15,6 +16,8 @@ import java.util.TimerTask;
 
 public class RotationActivity2 extends ActionBarActivity implements SensorEventListener {
     //Code from: http://www.codeproject.com/Articles/729759/Android-Sensor-Fusion-Tutorial
+    private TextView theview;
+
     private SensorManager mSensorManager = null;
 
     // angular speeds from gyro
@@ -51,7 +54,7 @@ public class RotationActivity2 extends ActionBarActivity implements SensorEventL
 
     // for the alculateFusedOrientationTask class
     public static final int TIME_CONSTANT = 30;
-    public static final float FILTER_COEFFICIENT = 0.98f;
+    public static final float FILTER_COEFFICIENT = 0.92f;
     private Timer fuseTimer = new Timer();
 
     @Override
@@ -71,6 +74,9 @@ public class RotationActivity2 extends ActionBarActivity implements SensorEventL
         // get sensorManager and initialise sensor listeners
         mSensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
         initListeners();
+
+        theview = (TextView) findViewById(R.id.the_view);
+        theview.setText("Not changed");
 
         // wait for one second until gyroscope and magnetometer/accelerometer
         // data is initialised then scedule the complementary filter task
@@ -101,16 +107,19 @@ public class RotationActivity2 extends ActionBarActivity implements SensorEventL
                 // then calculate new orientation
                 System.arraycopy(event.values, 0, accel, 0, 3);
                 calculateAccMagOrientation();
+                theview.setText(String.valueOf(Math.round(Math.toDegrees(fusedOrientation[0]))));
                 break;
 
             case Sensor.TYPE_GYROSCOPE:
                 // process gyro data
                 gyroFunction(event);
+                theview.setText(String.valueOf(Math.round(Math.toDegrees(fusedOrientation[0]))));
                 break;
 
             case Sensor.TYPE_MAGNETIC_FIELD:
                 // copy new magnetometer data into magnet array
                 System.arraycopy(event.values, 0, magnet, 0, 3);
+                theview.setText(String.valueOf(Math.round(Math.toDegrees(fusedOrientation[0]))));
                 break;
         }
     }
