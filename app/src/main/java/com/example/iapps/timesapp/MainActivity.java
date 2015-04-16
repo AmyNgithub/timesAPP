@@ -29,7 +29,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private float totalRotation = 0; //Total rotation so far
     float deltaRotation;
     private final static int DEGREES_PER_MINUTE = 5;
-    private final static int UPDATES_BEFORE_TIMER_START = 30; //About 2 sec
+    private final static int UPDATES_BEFORE_TIMER_START = 13; //About 0.78 sec (1 == 60 ms)
     private int emptyUpdates = 0;
 
     CountDownTimer countDown = null;
@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         minutesView = (TextView) findViewById(R.id.activity_main_minutes);
-        minutesView.setText("Not changed");
+        updateTime();
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null){
@@ -115,7 +115,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 deltaRotation = event.values[2]*dT;
                 //Kanske en if sats här
 
-                if(event.values[2] > 0.1f || event.values[2] < -0.1f){
+                if(event.values[2] > 0.3f || event.values[2] < -0.3f){
                     totalRotation += Math.toDegrees(deltaRotation);
                     emptyUpdates = 0;
                     if(countDown != null){
@@ -125,24 +125,28 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                     }
                     if(totalRotation > DEGREES_PER_MINUTE){
                         totalRotation = 0;
-                        seconds = 0;
-                        minutes++;
+                        if(minutes > 0){
+                            seconds = 0;
+                            minutes--;
+                        }else if(seconds > 0){
+                            seconds = 0;
+                        }
                         updateTime();
                     }else if (totalRotation < -DEGREES_PER_MINUTE){
                         totalRotation = 0;
                         seconds = 0;
-                        minutes--;
+                        minutes++;
                         updateTime();
                     }
                 }else if(!timerOn){
                     emptyUpdates++;
                     if(emptyUpdates > UPDATES_BEFORE_TIMER_START && (minutes != 0 || seconds != 0)){
                         emptyUpdates = 0;
-                        long millis = minutes * 60000;
+                        long millis = minutes * 60000 + seconds * 1000;
                         countDown = new CountDownTimer(millis, 1000) {
 
                             public void onTick(long millisUntilFinished) {
-                                long totalSeconds = millisUntilFinished / 1000;
+                                long totalSeconds = Math.round(millisUntilFinished / 1000.0);
                                 minutes = totalSeconds/60;
                                 seconds = totalSeconds%60;
                                 updateTime();
@@ -166,7 +170,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     }
 
     private void updateTime(){
-        minutesView.setText(String.valueOf(minutes + ":" + seconds));
+        String min = String.format("%02d", minutes);
+        String sec = String.format("%02d", seconds);
+
+        minutesView.setText(String.valueOf(min + ":" + sec));
         //Lägg till tick ljud och sånt
     }
 
