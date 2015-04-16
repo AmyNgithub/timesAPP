@@ -20,6 +20,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private Sensor mGyro;
 
     private boolean onTable = false;
+    private boolean timerOn = false;
 
     private long minutes = 0;
     private long seconds = 0;
@@ -31,7 +32,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private final static int UPDATES_BEFORE_TIMER_START = 30; //About 2 sec
     private int emptyUpdates = 0;
 
-    CountDownTimer coundDown = null;
+    CountDownTimer countDown = null;
 
 
     //All kod från: http://developer.android.com/guide/topics/sensors/sensors_overview.html
@@ -117,9 +118,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 if(event.values[2] > 0.1f || event.values[2] < -0.1f){
                     totalRotation += Math.toDegrees(deltaRotation);
                     emptyUpdates = 0;
-                    if(coundDown != null){
-                        coundDown.cancel();
-                        coundDown = null;
+                    if(countDown != null){
+                        countDown.cancel();
+                        timerOn = false;
+                        countDown = null;
                     }
                     if(totalRotation > DEGREES_PER_MINUTE){
                         totalRotation = 0;
@@ -132,11 +134,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         minutes--;
                         updateTime();
                     }
-                }else{
+                }else if(!timerOn){
                     emptyUpdates++;
-                    if(emptyUpdates > UPDATES_BEFORE_TIMER_START && minutes != 0 && seconds != 0){
+                    if(emptyUpdates > UPDATES_BEFORE_TIMER_START && (minutes != 0 || seconds != 0)){
+                        emptyUpdates = 0;
                         long millis = minutes * 60000;
-                        coundDown = new CountDownTimer(millis, 1000) {
+                        countDown = new CountDownTimer(millis, 1000) {
 
                             public void onTick(long millisUntilFinished) {
                                 long totalSeconds = millisUntilFinished / 1000;
@@ -150,7 +153,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                                 //Lägg till timer osv
                             }
                         };
-                        coundDown.start();
+                        timerOn = true;
+                        countDown.start();
                     }
                 }
             }
