@@ -5,9 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.SoundPool;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -24,7 +22,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private TextView minutesView;
     private Sensor mGyro;
     private MediaPlayer mPlayer;
-    private SoundPool sp;
+    //private SoundPool sp;
 
     private boolean onTable = false;
     private boolean timerOn = false;
@@ -38,12 +36,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private final static int DEGREES_PER_MINUTE = 5;
     private final static int UPDATES_BEFORE_TIMER_START = 13; //About 0.78 sec (1 == 60 ms)
     private int emptyUpdates = 0;
-    private int soundId;
 
     CountDownTimer countDown = null;
 
 
     //All kod från: http://developer.android.com/guide/topics/sensors/sensors_overview.html
+    // Och massa andra ställen :D:D
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +50,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         minutesView = (TextView) findViewById(R.id.activity_main_minutes);
         updateTime();
         mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alarm);
-        sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        mPlayer.setLooping(true);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null){
@@ -182,12 +180,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                                 seconds = 0;
                                 updateTime();
 
-
-                                /** soundId for Later handling of sound pool **/
-                                soundId = sp.load("@raw/alarm", 1); // in 2nd param u have to pass your desire ringtone
-
-                                sp.play(soundId, 1, 1, 0, 0, 1);
-                                mPlayer.setLooping(true);
                                 mPlayer.start();
                             }
                         };
