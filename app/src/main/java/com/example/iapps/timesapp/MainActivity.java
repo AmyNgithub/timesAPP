@@ -11,6 +11,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -20,6 +22,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private SensorManager mSensorManager;
     private Sensor mGravity;
     private TextView minutesView;
+    private ImageView infoGraphics;
     private Sensor mGyro;
     private MediaPlayer mPlayer;
     //private SoundPool sp;
@@ -48,6 +51,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         minutesView = (TextView) findViewById(R.id.activity_main_minutes);
+        infoGraphics = (ImageView) findViewById(R.id.imageViewPhoneRot);
         updateTime();
         mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alarm);
         mPlayer.setLooping(true);
@@ -159,6 +163,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         totalRotation = 0;
                         seconds = 0;
                         minutes++;
+                        hideImage();
                         updateTime();
                     }
                 }else if(!timerOn){
@@ -201,6 +206,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
         minutesView.setText(String.valueOf(min + ":" + sec));
         //Lägg till tick ljud och sånt
+    }
+
+    private void hideImage(){
+        if (infoGraphics.getVisibility() == View.VISIBLE) {
+            infoGraphics.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
