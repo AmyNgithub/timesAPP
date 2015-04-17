@@ -15,12 +15,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 
 public class MainActivity extends ActionBarActivity implements SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor mGravity;
     private TextView minutesView;
     private Sensor mGyro;
+    private MediaPlayer mPlayer;
+    private SoundPool sp;
 
     private boolean onTable = false;
     private boolean timerOn = false;
@@ -34,6 +38,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private final static int DEGREES_PER_MINUTE = 5;
     private final static int UPDATES_BEFORE_TIMER_START = 13; //About 0.78 sec (1 == 60 ms)
     private int emptyUpdates = 0;
+    private int soundId;
 
     CountDownTimer countDown = null;
 
@@ -46,6 +51,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
         minutesView = (TextView) findViewById(R.id.activity_main_minutes);
         updateTime();
+        mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alarm);
+        sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null){
@@ -107,6 +114,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                     onTable = true;
                 } else {
                     //Upside down
+                    mPlayer.stop();
+                    try {
+                        mPlayer.prepare();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
             } else {
@@ -119,7 +132,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 deltaRotation = event.values[2]*dT;
                 //Kanske en if sats här
 
-                if(event.values[2] > 0.3f || event.values[2] < -0.3f){
+                if(event.values[2] > 0.1f || event.values[2] < -0.1f){
                     totalRotation += Math.toDegrees(deltaRotation);
                     emptyUpdates = 0;
                     if(totalRotation > DEGREES_PER_MINUTE){
@@ -166,15 +179,15 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
                             public void onFinish() {
                                 minutesView.setText("Done!");
-                                SoundPool sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+                                seconds = 0;
+                                updateTime();
+
 
                                 /** soundId for Later handling of sound pool **/
-                                int soundId = sp.load("@raw/alarm", 1); // in 2nd param u have to pass your desire ringtone
+                                soundId = sp.load("@raw/alarm", 1); // in 2nd param u have to pass your desire ringtone
 
                                 sp.play(soundId, 1, 1, 0, 0, 1);
-
-                                MediaPlayer mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alarm); // in 2nd param u have to pass your desire ringtone
-                                //mPlayer.prepare();
+                                mPlayer.setLooping(true);
                                 mPlayer.start();
                             }
                         };
