@@ -108,6 +108,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
             } else {
                 onTable = false;
+                totalRotation = 0;
             }
         } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             if(timestamp != 0 && onTable) {
@@ -118,13 +119,15 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 if(event.values[2] > 0.3f || event.values[2] < -0.3f){
                     totalRotation += Math.toDegrees(deltaRotation);
                     emptyUpdates = 0;
-                    if(countDown != null){
-                        countDown.cancel();
-                        timerOn = false;
-                        countDown = null;
-                    }
                     if(totalRotation > DEGREES_PER_MINUTE){
                         totalRotation = 0;
+
+                        if(countDown != null){
+                            countDown.cancel();
+                            timerOn = false;
+                            countDown = null;
+                        }
+
                         if(minutes > 0){
                             seconds = 0;
                             minutes--;
@@ -133,6 +136,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         }
                         updateTime();
                     }else if (totalRotation < -DEGREES_PER_MINUTE){
+                        if(countDown != null){
+                            countDown.cancel();
+                            timerOn = false;
+                            countDown = null;
+                        }
+
                         totalRotation = 0;
                         seconds = 0;
                         minutes++;
