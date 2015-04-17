@@ -5,6 +5,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -163,7 +166,16 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
                             public void onFinish() {
                                 minutesView.setText("Done!");
-                                //Lägg till timer osv
+                                SoundPool sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+
+                                /** soundId for Later handling of sound pool **/
+                                int soundId = sp.load("@raw/alarm", 1); // in 2nd param u have to pass your desire ringtone
+
+                                sp.play(soundId, 1, 1, 0, 0, 1);
+
+                                MediaPlayer mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alarm); // in 2nd param u have to pass your desire ringtone
+                                //mPlayer.prepare();
+                                mPlayer.start();
                             }
                         };
                         timerOn = true;
