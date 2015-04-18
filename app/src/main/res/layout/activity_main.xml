@@ -4,7 +4,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
-    android:background="@drawable/gradient">
+    android:background="@drawable/gradient"
+    android:keepScreenOn="true"> <!--http://stackoverflow.com/questions/5712849/how-do-i-keep-the-screen-on-in-my-app -->
 
     <TextView android:id="@+id/activity_main_minutes"
         android:layout_width="match_parent"
