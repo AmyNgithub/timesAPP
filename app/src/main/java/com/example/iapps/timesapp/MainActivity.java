@@ -181,7 +181,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                             }
 
                             public void onFinish() {
-                                minutesView.setText("Done!");
                                 seconds = 0;
                                 updateTime();
 
