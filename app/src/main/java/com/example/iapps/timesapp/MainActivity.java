@@ -126,7 +126,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
             } else {
                 onTable = false;
-                totalRotation = 0;
+                //totalRotation = 0;
             }
         } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             if(timestamp != 0 && onTable) {
@@ -163,7 +163,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         totalRotation = 0;
                         seconds = 0;
                         minutes++;
-                        hideImage();
+
                         updateTime();
                     }
                 }else if(!timerOn){
@@ -188,6 +188,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                             }
                         };
                         timerOn = true;
+                        hideImage();
                         countDown.start();
                     }
                 }
