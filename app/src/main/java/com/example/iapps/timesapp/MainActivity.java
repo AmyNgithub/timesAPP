@@ -29,6 +29,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     private boolean onTable = false;
     private boolean timerOn = false;
+    private boolean alarmOn = false;
 
     private long minutes = 0;
     private long seconds = 0;
@@ -117,6 +118,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 } else {
                     //Upside down
                     mPlayer.stop();
+                    alarmOn = false;
                     try {
                         mPlayer.prepare();
                     } catch (IOException e) {
@@ -129,7 +131,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 //totalRotation = 0;
             }
         } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            if(timestamp != 0 && onTable) {
+            if(timestamp != 0 && onTable && !alarmOn) {
                 float dT = (event.timestamp - timestamp) * NS2S;
                 deltaRotation = event.values[2]*dT;
                 //Kanske en if sats här
@@ -181,6 +183,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                             }
 
                             public void onFinish() {
+                                alarmOn = true;
+
                                 seconds = 0;
                                 updateTime();
 
