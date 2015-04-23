@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.os.Vibrator;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private ImageView infoGraphics;
     private Sensor mGyro;
     private MediaPlayer mPlayer;
+    private Vibrator vib;
     //private SoundPool sp;
 
     private boolean onTable = false;
@@ -39,6 +41,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     float deltaRotation;
     private final static int DEGREES_PER_MINUTE = 5;
     private final static int UPDATES_BEFORE_TIMER_START = 13; //About 0.78 sec (1 == 60 ms)
+    private final static int VIBRATE_DURATION = 50;
     private int emptyUpdates = 0;
 
     CountDownTimer countDown = null;
@@ -56,6 +59,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         updateTime();
         mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alarm);
         mPlayer.setLooping(true);
+        vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null){
@@ -151,6 +155,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         if(minutes > 0){
                             seconds = 0;
                             minutes--;
+                            vib.vibrate(VIBRATE_DURATION);
                         }else if(seconds > 0){
                             seconds = 0;
                         }
@@ -165,6 +170,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         totalRotation = 0;
                         seconds = 0;
                         minutes++;
+                        vib.vibrate(VIBRATE_DURATION);
 
                         updateTime();
                     }
@@ -231,3 +237,4 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mSensorManager.unregisterListener(this);
     }
 }
+

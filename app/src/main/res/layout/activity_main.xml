@@ -7,7 +7,8 @@
     android:background="@drawable/gradient"
     android:keepScreenOn="true"> <!--http://stackoverflow.com/questions/5712849/how-do-i-keep-the-screen-on-in-my-app -->
 
-    <TextView android:id="@+id/activity_main_minutes"
+    <TextView
+        android:id="@+id/activity_main_minutes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
