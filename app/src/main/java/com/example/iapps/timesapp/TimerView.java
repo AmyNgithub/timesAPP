@@ -8,35 +8,28 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 public class TimerView extends TextView {
-    private Paint mPaint;
-
-    public TimerView(Context context)
-    {
-        super(context);
-        init();
-    }
-    public TimerView(Context context, AttributeSet attrs)
-    {
-        super(context, attrs);
-        init();
-    }
-    public TimerView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
+    Paint mPaint;
+    public TimerView(Context context, AttributeSet attrs){
+        super(context,attrs);
         init();
     }
 
-    private void init(){
+    private void init() {
+        mPaint = new Paint();
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setColor(Color.WHITE);
+        mPaint.setStrokeWidth(8);
+        mPaint.setAntiAlias(true);
     }
 
-
-
-    protected void onDraw(Canvas canvas) {
+    @Override
+    protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
 
-        canvas.drawCircle(10, 10, 30, mPaint);
+        float centerX = canvas.getWidth()/2;
+        float centerY = canvas.getHeight()/2;
+        float radius = centerX - 50;
 
+        canvas.drawCircle(centerX, centerY, radius, mPaint);
     }
-
 }

@@ -22,7 +22,7 @@ import java.io.IOException;
 public class MainActivity extends ActionBarActivity implements SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor mGravity;
-    private TextView minutesView;
+    private TimerView timerView;
     private ImageView infoGraphics;
     private Sensor mGyro;
     private MediaPlayer mPlayer;
@@ -54,7 +54,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        minutesView = (TextView) findViewById(R.id.activity_main_minutes);
+        timerView = (TimerView) findViewById(R.id.activity_main_minutes);
         infoGraphics = (ImageView) findViewById(R.id.imageViewPhoneRot);
         updateTime();
         mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alarm);
@@ -77,7 +77,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         }
         else {
             // Failure! No gravity sensor.
-            minutesView.setText("No gyro found");
+            timerView.setText("No gyro found");
         }
     }
 
@@ -214,7 +214,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         String min = String.format("%02d", minutes);
         String sec = String.format("%02d", seconds);
 
-        minutesView.setText(String.valueOf(min + ":" + sec));
+        timerView.setText(String.valueOf(min + ":" + sec));
         //Lägg till tick ljud och sånt
     }
 

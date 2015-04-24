@@ -7,7 +7,7 @@
     android:background="@drawable/gradient"
     android:keepScreenOn="true"> <!--http://stackoverflow.com/questions/5712849/how-do-i-keep-the-screen-on-in-my-app -->
 
-    <TextView
+    <com.example.iapps.timesapp.TimerView
         android:id="@+id/activity_main_minutes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
