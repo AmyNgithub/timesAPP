@@ -16,14 +16,15 @@
         android:gravity="center"
         android:textStyle="bold"
         android:textColor="@android:color/white"
-        android:textSize="72sp"/>
+        android:textSize="72sp"
+        android:padding="25dp"/>
 
     <ImageView
         android:id="@+id/imageViewPhoneRot"
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:src="@drawable/telefonrot"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="10dp"
         android:layout_alignBottom="@+id/activity_main_minutes"
         android:layout_centerHorizontal="true" />
 

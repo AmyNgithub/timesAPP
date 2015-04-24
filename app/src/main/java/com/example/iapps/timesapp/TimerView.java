@@ -9,9 +9,9 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 public class TimerView extends TextView {
-    private final static float OFFSET = 50f;
     Paint timePaint, bgPaint;
     long seconds;
+    RectF oval;
 
 
     public TimerView(Context context, AttributeSet attrs){
@@ -37,34 +37,39 @@ public class TimerView extends TextView {
     }
 
     @Override
-    protected void onDraw(Canvas canvas){
-        super.onDraw(canvas);
+    protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
+        super.onSizeChanged(xNew, yNew, xOld, yOld);
 
         float left,top,right,bottom;
-        if(canvas.getHeight() > canvas.getWidth()){
+        if(yNew > xNew){
             //portrait
-            left = OFFSET;
-            right = canvas.getWidth()-OFFSET;
+            left = getPaddingLeft();
+            right = xNew - getPaddingRight();
 
             float halfSide = (right-left)/2;
-            float centerY = canvas.getHeight()/2;
+            float centerY = yNew/2;
 
             top = centerY - halfSide;
             bottom = centerY + halfSide;
 
         }else{
             //landscape (never used in this app)
-            top = OFFSET;
-            bottom = canvas.getHeight()-OFFSET;
+            top = getPaddingTop();
+            bottom = yNew-getPaddingBottom();
 
             float halfSide = (bottom-top)/2;
-            float centerX = canvas.getWidth()/2;
+            float centerX = xNew/2;
 
             right = centerX - halfSide;
             left = centerX + halfSide;
         }
 
-        RectF oval = new RectF(left,top,right,bottom);
+        oval = new RectF(left,top,right,bottom);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas){
+        super.onDraw(canvas);
 
         float sweepAng = seconds/10.0f;
 
