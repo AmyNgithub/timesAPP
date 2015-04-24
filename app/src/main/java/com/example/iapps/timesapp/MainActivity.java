@@ -56,7 +56,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
         timerView = (TimerView) findViewById(R.id.activity_main_minutes);
         infoGraphics = (ImageView) findViewById(R.id.imageViewPhoneRot);
-        updateTime();
         mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alarm);
         mPlayer.setLooping(true);
         vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -159,7 +158,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         }else if(seconds > 0){
                             seconds = 0;
                         }
-                        updateTime();
+                        timerView.setTime(minutes,seconds);
                     }else if (totalRotation < -DEGREES_PER_MINUTE){
                         if(countDown != null){
                             countDown.cancel();
@@ -172,7 +171,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         minutes++;
                         vib.vibrate(VIBRATE_DURATION);
 
-                        updateTime();
+                        timerView.setTime(minutes,seconds);
                     }
                 }else if(!timerOn){
                     emptyUpdates++;
@@ -185,14 +184,14 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                                 long totalSeconds = Math.round(millisUntilFinished / 1000.0);
                                 minutes = totalSeconds/60;
                                 seconds = totalSeconds%60;
-                                updateTime();
+                                timerView.setTime(minutes,seconds);
                             }
 
                             public void onFinish() {
                                 alarmOn = true;
 
                                 seconds = 0;
-                                updateTime();
+                                timerView.setTime(minutes,seconds);
 
                                 mPlayer.start();
                             }
@@ -208,14 +207,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             timestamp = event.timestamp;
         }
 
-    }
-
-    private void updateTime(){
-        String min = String.format("%02d", minutes);
-        String sec = String.format("%02d", seconds);
-
-        timerView.setText(String.valueOf(min + ":" + sec));
-        //Lägg till tick ljud och sånt
     }
 
     private void hideImage(){
