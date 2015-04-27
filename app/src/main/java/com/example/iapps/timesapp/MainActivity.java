@@ -131,15 +131,15 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 if (axisz > 0) {
 
                     onTable = true;
-                } else {
+                //} else {
                     //Upside down
-                    mPlayer.stop();
-                    alarmOn = false;
-                    try {
-                        mPlayer.prepare();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                   // mPlayer.stop();
+                   // alarmOn = false;
+                   // try {
+                    //    mPlayer.prepare();
+                   // } catch (IOException e) {
+                   //     e.printStackTrace();
+                   // }
                 }
 
             } else {
@@ -225,6 +225,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             Log.d("Proximity sensor" ,String.valueOf(mProximity.getMaximumRange()));
             if(distance < 5){
                 mPlayer.stop();
+                countDown.cancel();
                 alarmOn = false;
                 timerOn = false;
                 try {
