@@ -22,14 +22,14 @@ public class TimerView extends TextView {
     private void init() {
         timePaint = new Paint();
         timePaint.setStyle(Paint.Style.STROKE);
-        timePaint.setColor(Color.MAGENTA);
-        timePaint.setStrokeWidth(13);
+        timePaint.setColor(Color.argb(1000,198,17,236));
+        timePaint.setStrokeWidth(21);
         timePaint.setAntiAlias(true);
 
         bgPaint = new Paint();
         bgPaint.setStyle(Paint.Style.STROKE);
         bgPaint.setColor(Color.WHITE);
-        bgPaint.setStrokeWidth(12);
+        bgPaint.setStrokeWidth(20);
         bgPaint.setAntiAlias(true);
 
         seconds = 0;

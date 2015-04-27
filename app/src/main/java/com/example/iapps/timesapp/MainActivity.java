@@ -9,6 +9,7 @@ import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,7 @@ import java.io.IOException;
 public class MainActivity extends ActionBarActivity implements SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor mGravity;
+    private Sensor mProximity; //Proximity sensor
     private TimerView timerView;
     private ImageView infoGraphics;
     private Sensor mGyro;
@@ -60,6 +62,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mPlayer.setLooping(true);
         vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
+
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null){
             // Success! There's a gravity sensor.
@@ -74,9 +77,18 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             // Success! There's a gravity sensor.
             mGyro = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         }
+
         else {
-            // Failure! No gravity sensor.
+            // Failure! No gyro sensor.
             timerView.setText("No gyro found");
+        }
+        if( mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null){
+            // Success! There's a Proximity sensor.
+            mProximity = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+            //mSensorManager.registerListener(this,mProximity,SensorManager.SENSOR_DELAY_NORMAL);
+        }else{
+            //failure! No proximity sensor.
+            timerView.setText("No proximity found");
         }
     }
 
@@ -117,6 +129,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
             if (Math.abs(axisz - sum) < offset) {
                 if (axisz > 0) {
+
                     onTable = true;
                 } else {
                     //Upside down
@@ -134,7 +147,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 //totalRotation = 0;
             }
         } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            if(timestamp != 0 && onTable && !alarmOn) {
+            if(timestamp != 0 && onTable && !alarmOn && !timerOn) { //Lock rotation is done here!
                 float dT = (event.timestamp - timestamp) * NS2S;
                 deltaRotation = event.values[2]*dT;
                 //Kanske en if sats här
@@ -172,6 +185,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         vib.vibrate(VIBRATE_DURATION);
 
                         timerView.setTime(minutes,seconds);
+
                     }
                 }else if(!timerOn){
                     emptyUpdates++;
@@ -199,12 +213,27 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         timerOn = true;
                         hideImage();
                         countDown.start();
+
                     }
                 }
             }
 
             // measurement done, save current time for next interval
             timestamp = event.timestamp;
+        }else if(event.sensor.getType() == Sensor.TYPE_PROXIMITY){
+            float distance = event.values[0];
+            Log.d("Proximity sensor" ,String.valueOf(mProximity.getMaximumRange()));
+            if(distance < 5){
+                mPlayer.stop();
+                alarmOn = false;
+                timerOn = false;
+                try {
+                    mPlayer.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
 
     }
@@ -220,6 +249,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         super.onResume();
         mSensorManager.registerListener(this, mGravity, SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(this, mGyro, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this,mProximity,SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
