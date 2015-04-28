@@ -11,8 +11,10 @@ import android.widget.TextView;
 public class TimerView extends TextView {
     Paint timePaint, bgPaint, textPaint;
     long seconds;
+    float secTextX;
+    float minTextX;
+    float textY;
     RectF oval;
-
 
     public TimerView(Context context, AttributeSet attrs){
         super(context, attrs);
@@ -72,6 +74,10 @@ public class TimerView extends TextView {
         }
 
         oval = new RectF(left,top,right,bottom);
+
+        textY = yNew*0.62f;
+        minTextX = xNew*0.240f;
+        secTextX = xNew*0.552f;
     }
 
     @Override
@@ -82,8 +88,8 @@ public class TimerView extends TextView {
 
         canvas.drawArc(oval,0,360,false,bgPaint);
         canvas.drawArc(oval,270,sweepAng,false, timePaint);
-        canvas.drawText("MIN",160,595,textPaint);
-        canvas.drawText("SEC",365,595,textPaint);
+        canvas.drawText("MIN",minTextX,textY,textPaint);
+        canvas.drawText("SEC",secTextX,textY,textPaint);
     }
 
     public void setTime(long minutes,long seconds){
