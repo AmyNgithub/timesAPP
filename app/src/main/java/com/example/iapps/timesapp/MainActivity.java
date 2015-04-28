@@ -1,6 +1,7 @@
 package com.example.iapps.timesapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -201,6 +202,13 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                             public void onFinish() {
                                 alarmOn = true;
 
+                                //Wakes up phone
+                                WakeLocker.acquire(getApplicationContext());
+                                //Sets the app in foreground
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                startActivity(intent);
+
                                 seconds = 0;
                                 timerView.setTime(minutes, seconds);
 
@@ -224,6 +232,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 alarmOn = false;
                 timerOn = false;
                 rotationLock = false;
+                WakeLocker.release(); //part of the wake up phone on alarm on
 
                 try {
                     mPlayer.prepare();
