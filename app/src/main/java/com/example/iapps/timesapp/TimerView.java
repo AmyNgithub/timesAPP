@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 public class TimerView extends TextView {
-    Paint timePaint, bgPaint;
+    Paint timePaint, bgPaint, textPaint;
     long seconds;
     RectF oval;
 
@@ -31,6 +31,13 @@ public class TimerView extends TextView {
         bgPaint.setColor(Color.WHITE);
         bgPaint.setStrokeWidth(20);
         bgPaint.setAntiAlias(true);
+
+        textPaint = new Paint();
+        textPaint.setStyle(Paint.Style.STROKE);
+        textPaint.setColor(Color.WHITE);
+        textPaint.setStrokeWidth(1);
+        textPaint.setTextSize(70);
+        textPaint.setAntiAlias(true);
 
         seconds = 0;
         updateDisplayedTime();
@@ -75,6 +82,8 @@ public class TimerView extends TextView {
 
         canvas.drawArc(oval,0,360,false,bgPaint);
         canvas.drawArc(oval,270,sweepAng,false, timePaint);
+        canvas.drawText("MIN",160,595,textPaint);
+        canvas.drawText("SEC",365,595,textPaint);
     }
 
     public void setTime(long minutes,long seconds){
