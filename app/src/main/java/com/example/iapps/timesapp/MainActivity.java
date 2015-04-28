@@ -205,6 +205,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                                 //Wakes up phone
                                 WakeLocker.acquire(getApplicationContext());
                                 //Sets the app in foreground
+                                //http://stackoverflow.com/questions/12074980/bring-application-to-front-after-user-clicks-on-home-button
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                 startActivity(intent);
