@@ -38,7 +38,8 @@ public class TimerView extends TextView {
         textPaint.setStyle(Paint.Style.STROKE);
         textPaint.setColor(Color.WHITE);
         textPaint.setStrokeWidth(1);
-        textPaint.setTextSize(70);
+        int scaledSize = getResources().getDimensionPixelSize(R.dimen.min_sec_font_size);
+        textPaint.setTextSize(scaledSize);
         textPaint.setAntiAlias(true);
 
         seconds = 0;
@@ -77,7 +78,7 @@ public class TimerView extends TextView {
 
         textY = yNew*0.62f;
         minTextX = xNew*0.240f;
-        secTextX = xNew*0.552f;
+        secTextX = xNew*0.556f;
     }
 
     @Override
