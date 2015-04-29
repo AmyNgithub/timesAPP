@@ -10,13 +10,11 @@ import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.os.Vibrator;
-import android.widget.TextView;
 
 import java.io.IOException;
 
