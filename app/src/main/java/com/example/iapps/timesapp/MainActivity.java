@@ -1,5 +1,6 @@
 package com.example.iapps.timesapp;
 
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -8,6 +9,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.CountDownTimer;
+import android.os.PowerManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -28,6 +30,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private Sensor mGyro;
     private MediaPlayer mPlayer;
     private Vibrator vib;
+    private PowerManager.WakeLock fullWakeLock;
+    private PowerManager.WakeLock partialWakeLock;
     //private SoundPool sp;
 
     private boolean onTable = false;
@@ -64,7 +68,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alarm);
         mPlayer.setLooping(true);
         vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
+        createWakeLocks();
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null) {
@@ -201,12 +205,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                                 alarmOn = true;
 
                                 //Wakes up phone
-                                WakeLocker.acquire(getApplicationContext());
+                                wakeDevice();
                                 //Sets the app in foreground
                                 //http://stackoverflow.com/questions/12074980/bring-application-to-front-after-user-clicks-on-home-button
-                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                                startActivity(intent);
+                                //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                //intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                //startActivity(intent);
 
                                 seconds = 0;
                                 timerView.setTime(minutes, seconds);
@@ -231,7 +235,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 alarmOn = false;
                 timerOn = false;
                 rotationLock = false;
-                WakeLocker.release(); //part of the wake up phone on alarm on
 
                 try {
                     mPlayer.prepare();
@@ -250,6 +253,21 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             infoGraphics.setVisibility(View.INVISIBLE);
         }
     }
+    // Found at http://stackoverflow.com/questions/14741612/android-wake-up-and-unlock-device
+    // Called from onCreate
+    protected void createWakeLocks(){
+        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        fullWakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "Loneworker - FULL WAKE LOCK");
+        partialWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Loneworker - PARTIAL WAKE LOCK");
+    }
+    // Called whenever we need to wake up the device
+    public void wakeDevice() {
+        fullWakeLock.acquire();
+
+        KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("TAG");
+        keyguardLock.disableKeyguard();
+    }
 
     @Override
     protected void onResume() {
@@ -257,12 +275,22 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mSensorManager.registerListener(this, mGravity, SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(this, mGyro, SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_UI);
+
+        // Called implicitly when device is about to wake up or foregrounded
+        if(fullWakeLock.isHeld()){
+            fullWakeLock.release();
+        }
+        if(partialWakeLock.isHeld()){
+            partialWakeLock.release();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(this);
+        // Called implicitly when device is about to sleep or application is backgrounded
+        partialWakeLock.acquire();
     }
 }
 

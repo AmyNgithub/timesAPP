@@ -3,7 +3,9 @@
     package="com.example.iapps.timesapp" >
 
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/> //To allow wake up of phone when alarm goes off
+    //To allow wake up of phone when alarm goes off
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
 
     <application
         android:allowBackup="true"
