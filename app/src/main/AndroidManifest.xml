@@ -22,18 +22,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".RotationActivity"
-            android:label="@string/title_activity_rotation" >
-        </activity>
-        <activity
-            android:name=".RotationActivity2"
-            android:label="@string/title_activity_rotation_activity2" >
-        </activity>
-        <activity
-            android:name=".GyroRotationActivity"
-            android:label="@string/title_activity_gyro_rotation" >
-        </activity>
     </application>
 
 </manifest>
