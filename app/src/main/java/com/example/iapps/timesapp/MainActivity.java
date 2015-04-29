@@ -70,6 +70,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         createWakeLocks();
 
+
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null) {
             // Success! There's a gravity sensor.
@@ -134,10 +135,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             if (Math.abs(axisz - sum) < offset) {
                 if (axisz > 0) {
                     onTable = true;
+                    changeImage();
                 }
 
             } else {
                 onTable = false;
+                changeImage();
                 //totalRotation = 0;
             }
         } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
@@ -155,6 +158,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         if (countDown != null) {
                             countDown.cancel();
                             timerOn = false;
+                            changeImage();
                         }
 
                         if (minutes > 0) {
@@ -169,6 +173,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         if (countDown != null) {
                             countDown.cancel();
                             timerOn = false;
+                            changeImage();
                         }
 
                         totalRotation = 0;
@@ -196,6 +201,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                                     lockTicks++;
                                     if (lockTicks >= TICKS_TO_LOCK) {
                                         rotationLock = true;
+                                        changeImage();
                                         lockTicks = 0;
                                     }
                                 }
@@ -203,6 +209,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
                             public void onFinish() {
                                 alarmOn = true;
+                                changeImage();
 
                                 //Wakes up phone
                                 wakeDevice();
@@ -220,7 +227,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         };
                         timerOn = true;
                         rotationLock = true;
-                        hideImage();
+                        changeImage();
                         countDown.start();
 
                     }
@@ -249,8 +256,47 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     }
 
     private void hideImage() {
-        if (infoGraphics.getVisibility() == View.VISIBLE) {
-            infoGraphics.setVisibility(View.INVISIBLE);
+        infoGraphics.setVisibility(View.INVISIBLE);
+    }
+
+    private void showLock() {
+        infoGraphics.setVisibility(View.VISIBLE);
+        infoGraphics.setImageResource(R.drawable.lock);
+    }
+
+    private void showUnlock() {
+        infoGraphics.setVisibility(View.VISIBLE);
+        infoGraphics.setImageResource(R.drawable.unlock);
+    }
+
+    private void showPutOnTable() {
+        infoGraphics.setVisibility(View.VISIBLE);
+        infoGraphics.setImageResource(R.drawable.put_on_table);
+    }
+
+    private void showRotate() {
+        infoGraphics.setVisibility(View.VISIBLE);
+        infoGraphics.setImageResource(R.drawable.telefonrot);
+    }
+
+    private void showTurnOffAlarm() {
+        infoGraphics.setVisibility(View.VISIBLE);
+        infoGraphics.setImageResource(R.drawable.turn_off);
+    }
+
+    private void changeImage() {
+        if(alarmOn){
+            showTurnOffAlarm();
+        }else if(rotationLock){
+            showLock();
+        }else if(!rotationLock && timerOn){
+            showUnlock();
+        }else if(onTable){
+            showRotate();
+        }else if(!onTable){
+            showPutOnTable();
+        }else{
+            hideImage();
         }
     }
     // Found at http://stackoverflow.com/questions/14741612/android-wake-up-and-unlock-device
