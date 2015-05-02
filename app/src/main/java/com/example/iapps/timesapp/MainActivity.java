@@ -12,6 +12,7 @@ import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -208,21 +209,25 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                             }
 
                             public void onFinish() {
-                                alarmOn = true;
-                                changeImage();
-
                                 //Wakes up phone
                                 wakeDevice();
                                 //Sets the app in foreground
                                 //http://stackoverflow.com/questions/12074980/bring-application-to-front-after-user-clicks-on-home-button
-                                //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                //intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                                //startActivity(intent);
+                                Intent startIntent = new Intent(getApplicationContext(), MainActivity.class);
+                                startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                startActivity(startIntent);
+                                alarmOn = true;
+                                changeImage();
+
 
                                 seconds = 0;
                                 timerView.setTime(minutes, seconds);
+//                                Intent endIntent = new Intent(getApplicationContext(), MainActivity.class);
+//                                endIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                startActivity(endIntent);
 
                                 mPlayer.start();
+
                             }
                         };
                         timerOn = true;
@@ -237,6 +242,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             // measurement done, save current time for next interval
             timestamp = event.timestamp;
         } else if (event.sensor.getType() == Sensor.TYPE_PROXIMITY && event.values[0] == 0) {
+            Log.d("Proximity sensor","Proximity if clause entered");
             if (alarmOn) {
                 mPlayer.stop();
                 alarmOn = false;
