@@ -3,6 +3,7 @@ package com.example.iapps.timesapp;
 import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -18,11 +19,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 
 import java.io.IOException;
+import java.util.Locale;
 
 
-public class MainActivity extends ActionBarActivity implements SensorEventListener {
+public class MainActivity extends ActionBarActivity implements SensorEventListener,OnInitListener {
     private SensorManager mSensorManager;
     private Sensor mGravity;
     private Sensor mProximity; //Proximity sensor
@@ -33,6 +37,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private Vibrator vib;
     private PowerManager.WakeLock fullWakeLock;
     private PowerManager.WakeLock partialWakeLock;
+    private TextToSpeech TTS;
     //private SoundPool sp;
 
     private boolean onTable = false;
@@ -50,6 +55,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private final static int UPDATES_BEFORE_TIMER_START = 13; //About 0.78 sec (1 == 60 ms)
     private final static int VIBRATE_DURATION = 50;
     private final static int TICKS_TO_LOCK = 3;
+    private int TTS_CHECK_CODE = 0;
     int taskID;
 
     private int emptyUpdates = 0;
@@ -72,6 +78,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mPlayer.setLooping(true);
         vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         createWakeLocks();
+
+        Intent checkTTSIntent = new Intent();
+        checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(checkTTSIntent, TTS_CHECK_CODE);
 
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -121,6 +131,25 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == TTS_CHECK_CODE) {
+            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                TTS = new TextToSpeech(this, this);
+            }
+            else {
+                Intent installTTSIntent = new Intent();
+                installTTSIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                startActivity(installTTSIntent);
+            }
+        }
+    }
+
+    public void onInit(int initStatus) {
+        if (initStatus == TextToSpeech.SUCCESS) {
+            TTS.setLanguage(Locale.US);
+        }
     }
 
     @Override
@@ -192,6 +221,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                     if (emptyUpdates > UPDATES_BEFORE_TIMER_START && (minutes != 0 || seconds != 0)) {
                         emptyUpdates = 0;
                         long millis = minutes * 60000 + seconds * 1000;
+                        speakMinutes(minutes);
                         countDown = new CountDownTimer(millis, 1000) {
 
                             public void onTick(long millisUntilFinished) {
@@ -333,6 +363,15 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     protected void moveToFront() {
         final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         activityManager.moveTaskToFront(taskID, ActivityManager.MOVE_TASK_NO_USER_ACTION);
+    }
+
+    private void speakMinutes(long minutes) {
+        String speech = minutes + " minute";
+        if(minutes > 1){
+            speech += "s";
+        }
+        speech += " and counting";
+        TTS.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
     }
 
     @Override
