@@ -6,8 +6,7 @@
     //To allow wake up of phone when alarm goes off
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
-    //Move to front permissions
-    <uses-permission android:name="android.permission.GET_TASKS" />
+    //Move to front permission
     <uses-permission android:name="android.permission.REORDER_TASKS" />
 
     <application

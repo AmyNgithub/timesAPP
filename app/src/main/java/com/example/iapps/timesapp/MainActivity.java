@@ -1,16 +1,13 @@
 package com.example.iapps.timesapp;
 
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.support.v7.app.ActionBarActivity;
@@ -23,7 +20,6 @@ import android.widget.ImageView;
 import android.os.Vibrator;
 
 import java.io.IOException;
-import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity implements SensorEventListener {
@@ -54,6 +50,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private final static int UPDATES_BEFORE_TIMER_START = 13; //About 0.78 sec (1 == 60 ms)
     private final static int VIBRATE_DURATION = 50;
     private final static int TICKS_TO_LOCK = 3;
+    int taskID;
 
     private int emptyUpdates = 0;
     private int lockTicks = 0;
@@ -68,6 +65,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        taskID = this.getTaskId();
         timerView = (TimerView) findViewById(R.id.activity_main_minutes);
         infoGraphics = (ImageView) findViewById(R.id.imageViewPhoneRot);
         mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alarm);
@@ -250,7 +248,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             // measurement done, save current time for next interval
             timestamp = event.timestamp;
         } else if (event.sensor.getType() == Sensor.TYPE_PROXIMITY && event.values[0] == 0) {
-            Log.d("Proximity sensor","Proximity if clause entered");
+            Log.d("Proximity sensor", "Proximity if clause entered");
             if (alarmOn) {
                 mPlayer.stop();
                 alarmOn = false;
@@ -299,27 +297,29 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     }
 
     private void changeImage() {
-        if(alarmOn){
+        if (alarmOn) {
             showTurnOffAlarm();
-        }else if(rotationLock){
+        } else if (rotationLock) {
             showLock();
-        }else if(!rotationLock && timerOn){
+        } else if (!rotationLock && timerOn) {
             showUnlock();
-        }else if(onTable){
+        } else if (onTable) {
             showRotate();
-        }else if(!onTable){
+        } else if (!onTable) {
             showPutOnTable();
-        }else{
+        } else {
             hideImage();
         }
     }
+
     // Found at http://stackoverflow.com/questions/14741612/android-wake-up-and-unlock-device
     // Called from onCreate
-    protected void createWakeLocks(){
+    protected void createWakeLocks() {
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         fullWakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "Loneworker - FULL WAKE LOCK");
         partialWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Loneworker - PARTIAL WAKE LOCK");
     }
+
     // Called whenever we need to wake up the device
     public void wakeDevice() {
         fullWakeLock.acquire();
@@ -330,20 +330,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     }
 
     //http://stackoverflow.com/questions/6919616/android-how-to-bring-a-task-to-the-foreground/18197545#18197545
-    @TargetApi(11)
     protected void moveToFront() {
-        if (Build.VERSION.SDK_INT >= 11) { // honeycomb
-            final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-            final List<ActivityManager.RunningTaskInfo> recentTasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
-
-            for (int i = 0; i < recentTasks.size(); i++)
-            {
-                // bring to front
-                if (recentTasks.get(i).baseActivity.toShortString().contains("com.example.iapps.timesapp")) {
-                    activityManager.moveTaskToFront(recentTasks.get(i).id, ActivityManager.MOVE_TASK_WITH_HOME);
-                }
-            }
-        }
+        final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.moveTaskToFront(taskID, ActivityManager.MOVE_TASK_NO_USER_ACTION);
     }
 
     @Override
@@ -354,10 +343,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mSensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_UI);
 
         // Called implicitly when device is about to wake up or foregrounded
-        if(fullWakeLock.isHeld()){
+        if (fullWakeLock.isHeld()) {
             fullWakeLock.release();
         }
-        if(partialWakeLock.isHeld()){
+        if (partialWakeLock.isHeld()) {
             partialWakeLock.release();
         }
     }
