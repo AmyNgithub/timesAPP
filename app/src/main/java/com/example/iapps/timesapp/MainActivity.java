@@ -8,7 +8,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.support.v7.app.ActionBarActivity;
@@ -38,7 +40,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private PowerManager.WakeLock fullWakeLock;
     private PowerManager.WakeLock partialWakeLock;
     private TextToSpeech TTS;
-    //private SoundPool sp;
 
     private boolean onTable = false;
     private boolean timerOn = false;
@@ -64,8 +65,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     CountDownTimer countDown = null;
 
 
-    //All kod från: http://developer.android.com/guide/topics/sensors/sensors_overview.html
-    // Och massa andra ställen :D:D
+    //Sensors kod från: http://developer.android.com/guide/topics/sensors/sensors_overview.html
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +74,17 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         taskID = this.getTaskId();
         timerView = (TimerView) findViewById(R.id.activity_main_minutes);
         infoGraphics = (ImageView) findViewById(R.id.imageViewPhoneRot);
-        mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.alarm);
-        mPlayer.setLooping(true);
+
+        mPlayer = new MediaPlayer();
+        mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+        try {
+            mPlayer.setDataSource(this, Uri.parse("android.resource://" + this.getPackageName() + "/" + R.raw.alarm));
+            mPlayer.setLooping(true);
+            mPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         createWakeLocks();
 
