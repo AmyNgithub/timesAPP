@@ -1,5 +1,7 @@
 package com.example.iapps.timesapp;
 
+import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.support.v7.app.ActionBarActivity;
@@ -20,6 +23,7 @@ import android.widget.ImageView;
 import android.os.Vibrator;
 
 import java.io.IOException;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity implements SensorEventListener {
@@ -211,11 +215,15 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                             public void onFinish() {
                                 //Wakes up phone
                                 wakeDevice();
+
                                 //Sets the app in foreground
                                 //http://stackoverflow.com/questions/12074980/bring-application-to-front-after-user-clicks-on-home-button
-                                Intent startIntent = new Intent(getApplicationContext(), MainActivity.class);
-                                startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                                startActivity(startIntent);
+                                //Intent startIntent = new Intent(getApplicationContext(), MainActivity.class);
+                                //startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                //startActivity(startIntent);
+
+                                moveToFront();
+
                                 alarmOn = true;
                                 changeImage();
 
@@ -319,6 +327,23 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("TAG");
         keyguardLock.disableKeyguard();
+    }
+
+    //http://stackoverflow.com/questions/6919616/android-how-to-bring-a-task-to-the-foreground/18197545#18197545
+    @TargetApi(11)
+    protected void moveToFront() {
+        if (Build.VERSION.SDK_INT >= 11) { // honeycomb
+            final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            final List<ActivityManager.RunningTaskInfo> recentTasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
+
+            for (int i = 0; i < recentTasks.size(); i++)
+            {
+                // bring to front
+                if (recentTasks.get(i).baseActivity.toShortString().contains("com.example.iapps.timesapp")) {
+                    activityManager.moveTaskToFront(recentTasks.get(i).id, ActivityManager.MOVE_TASK_WITH_HOME);
+                }
+            }
+        }
     }
 
     @Override
