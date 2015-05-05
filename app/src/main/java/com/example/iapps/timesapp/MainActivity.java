@@ -15,7 +15,6 @@ import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,7 +54,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private final static int DEGREES_PER_MINUTE = 5;
     private final static int UPDATES_BEFORE_TIMER_START = 13; //About 0.78 sec (1 == 60 ms)
     private final static int VIBRATE_DURATION = 50;
-    private final static int TICKS_TO_LOCK = 3;
+    private final static int TICKS_TO_LOCK = 4;
     private int TTS_CHECK_CODE = 0;
     int taskID;
 
@@ -171,7 +170,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         if (event.sensor.getType() == Sensor.TYPE_GRAVITY) {
             float axisz = event.values[2];
             float sum = event.values[0] + event.values[1] + event.values[2];
-            float offset = 0.5f;
+            float offset = 0.8f;
 
             if (Math.abs(axisz - sum) < offset) {
                 if (axisz > 0) {
@@ -277,6 +276,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         };
                         timerOn = true;
                         rotationLock = true;
+                        lockTicks = 0;
                         changeImage();
                         countDown.start();
 
@@ -287,7 +287,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             // measurement done, save current time for next interval
             timestamp = event.timestamp;
         } else if (event.sensor.getType() == Sensor.TYPE_PROXIMITY && event.values[0] == 0) {
-            Log.d("Proximity sensor", "Proximity if clause entered");
             if (alarmOn) {
                 mPlayer.stop();
                 alarmOn = false;
