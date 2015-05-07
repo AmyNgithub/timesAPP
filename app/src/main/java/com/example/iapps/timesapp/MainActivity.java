@@ -18,6 +18,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
@@ -280,6 +282,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         changeImage();
                         countDown.start();
 
+
                     }
                 }
             }
@@ -356,15 +359,23 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         fullWakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "Loneworker - FULL WAKE LOCK");
         partialWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Loneworker - PARTIAL WAKE LOCK");
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        Intent intent = getIntent();
+        intent.setFlags(
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                        Intent.FLAG_ACTIVITY_NEW_TASK
+        );
     }
 
     // Called whenever we need to wake up the device
     public void wakeDevice() {
         fullWakeLock.acquire();
 
-        KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
-        KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("TAG");
-        keyguardLock.disableKeyguard();
+        //KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        //KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("TAG");
+        //keyguardLock.disableKeyguard();
     }
 
     //http://stackoverflow.com/questions/6919616/android-how-to-bring-a-task-to-the-foreground/18197545#18197545
