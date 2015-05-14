@@ -15,6 +15,7 @@ import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +47,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private boolean timerOn = false;
     private boolean alarmOn = false;
     private boolean rotationLock = false;
+    private boolean handOverSensor = false;
 
     private long minutes = 0;
     private long seconds = 0;
@@ -56,7 +58,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private final static int DEGREES_PER_MINUTE = 5;
     private final static int UPDATES_BEFORE_TIMER_START = 13; //About 0.78 sec (1 == 60 ms)
     private final static int VIBRATE_DURATION = 50;
-    private final static int TICKS_TO_LOCK = 4;
+    private final static int TICKS_TO_LOCK = 3;
     private int TTS_CHECK_CODE = 0;
     int taskID;
 
@@ -189,8 +191,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             if (timestamp != 0 && onTable && !alarmOn && !rotationLock) { //Lock rotation is done here!
                 float dT = (event.timestamp - timestamp) * NS2S;
                 deltaRotation = event.values[2] * dT;
-                //Kanske en if sats här
-
                 if (event.values[2] > 0.1f || event.values[2] < -0.1f) {
                     totalRotation += Math.toDegrees(deltaRotation);
                     emptyUpdates = 0;
@@ -240,12 +240,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                                 seconds = totalSeconds % 60;
                                 timerView.setTime(minutes, seconds);
 
-                                if (!rotationLock) {
+                                if (!rotationLock && !handOverSensor) {
                                     lockTicks++;
                                     if (lockTicks >= TICKS_TO_LOCK) {
                                         rotationLock = true;
                                         changeImage();
-                                        lockTicks = 0;
                                     }
                                 }
                             }
@@ -289,20 +288,28 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
             // measurement done, save current time for next interval
             timestamp = event.timestamp;
-        } else if (event.sensor.getType() == Sensor.TYPE_PROXIMITY && event.values[0] == 0) {
-            if (alarmOn) {
-                mPlayer.stop();
-                alarmOn = false;
-                timerOn = false;
-                rotationLock = false;
+        } else if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
+            if(event.values[0] == 0){ //Hand appears over sensor
+                if (alarmOn) {
+                    mPlayer.stop();
+                    alarmOn = false;
+                    timerOn = false;
+                    rotationLock = false;
 
-                try {
-                    mPlayer.prepare();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    try {
+                        mPlayer.prepare();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else if (timerOn) {
+                    rotationLock = false;
+                    handOverSensor = true;
+                    lockTicks = 0;
                 }
-            } else if (timerOn) {
-                rotationLock = false;
+            }else{ //Hand leaves sensor
+                if(timerOn){
+                    handOverSensor = false;
+                }
             }
         }
 
