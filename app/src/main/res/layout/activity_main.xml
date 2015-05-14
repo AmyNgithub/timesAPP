@@ -21,11 +21,20 @@
 
     <ImageView
         android:id="@+id/imageViewPhoneRot"
-        android:layout_width="75dp"
+        android:layout_width="wrap_content"
         android:layout_height="75dp"
         android:src="@drawable/put_on_table"
         android:layout_marginBottom="10dp"
         android:layout_alignBottom="@+id/activity_main_minutes"
+        android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:id="@+id/imageViewLock"
+        android:layout_width="wrap_content"
+        android:layout_height="75dp"
+        android:visibility="invisible"
+        android:layout_marginTop="5dp"
+        android:layout_alignTop="@+id/activity_main_minutes"
         android:layout_centerHorizontal="true" />
 
     <!--android:layout_width="wrap_content"

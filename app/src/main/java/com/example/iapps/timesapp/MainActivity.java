@@ -36,6 +36,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private Sensor mProximity; //Proximity sensor
     private TimerView timerView;
     private ImageView infoGraphics;
+    private ImageView lockView;
     private Sensor mGyro;
     private MediaPlayer mPlayer;
     private Vibrator vib;
@@ -77,6 +78,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         taskID = this.getTaskId();
         timerView = (TimerView) findViewById(R.id.activity_main_minutes);
         infoGraphics = (ImageView) findViewById(R.id.imageViewPhoneRot);
+        lockView = (ImageView) findViewById(R.id.imageViewLock);
 
         mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
@@ -320,13 +322,18 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     }
 
     private void showLock() {
-        infoGraphics.setVisibility(View.VISIBLE);
-        infoGraphics.setImageResource(R.drawable.lock);
+        lockView.setVisibility(View.VISIBLE);
+        lockView.setImageResource(R.drawable.lock);
+        infoGraphics.setImageResource(R.drawable.cover_to_unlock);
     }
 
     private void showUnlock() {
-        infoGraphics.setVisibility(View.VISIBLE);
-        infoGraphics.setImageResource(R.drawable.unlock);
+        lockView.setVisibility(View.VISIBLE);
+        lockView.setImageResource(R.drawable.unlock);
+    }
+
+    private void hideLock(){
+        lockView.setVisibility(View.INVISIBLE);
     }
 
     private void showPutOnTable() {
@@ -352,9 +359,11 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         } else if (!rotationLock && timerOn) {
             showUnlock();
         } else if (onTable) {
+            hideLock();
             showRotate();
         } else if (!onTable) {
             showPutOnTable();
+            hideLock();
         } else {
             hideImage();
         }
