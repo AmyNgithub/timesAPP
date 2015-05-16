@@ -1,7 +1,6 @@
 package com.example.iapps.timesapp;
 
 import android.app.ActivityManager;
-import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -11,26 +10,25 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.PowerManager;
+import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.os.Vibrator;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeech.OnInitListener;
 
 import java.io.IOException;
 import java.util.Locale;
 
 
-public class MainActivity extends ActionBarActivity implements SensorEventListener,OnInitListener {
+public class MainActivity extends ActionBarActivity implements SensorEventListener, OnInitListener {
     private SensorManager mSensorManager;
     private Sensor mGravity;
     private Sensor mProximity; //Proximity sensor
@@ -68,9 +66,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     CountDownTimer countDown = null;
 
-
     //Sensors kod från: http://developer.android.com/guide/topics/sensors/sensors_overview.html
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,7 +113,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null) {
             // Success! There's a Proximity sensor.
             mProximity = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-            //mSensorManager.registerListener(this,mProximity,SensorManager.SENSOR_DELAY_NORMAL);
         } else {
             //failure! No proximity sensor.
             timerView.setText("No proximity found");
@@ -151,8 +146,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         if (requestCode == TTS_CHECK_CODE) {
             if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
                 TTS = new TextToSpeech(this, this);
-            }
-            else {
+            } else {
                 Intent installTTSIntent = new Intent();
                 installTTSIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
                 startActivity(installTTSIntent);
@@ -168,7 +162,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     @Override
     public final void onAccuracyChanged(Sensor sensor, int accuracy) {
-        //Vaskad
+        //Not used
     }
 
     @Override
@@ -187,7 +181,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             } else {
                 onTable = false;
                 changeImage();
-                //totalRotation = 0;
             }
         } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             if (timestamp != 0 && onTable && !alarmOn && !rotationLock) { //Lock rotation is done here!
@@ -256,25 +249,14 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                                 wakeDevice();
 
                                 //Sets the app in foreground
-                                //http://stackoverflow.com/questions/12074980/bring-application-to-front-after-user-clicks-on-home-button
-                                //Intent startIntent = new Intent(getApplicationContext(), MainActivity.class);
-                                //startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                                //startActivity(startIntent);
-
                                 moveToFront();
 
                                 alarmOn = true;
                                 changeImage();
 
-
                                 seconds = 0;
                                 timerView.setTime(minutes, seconds);
-//                                Intent endIntent = new Intent(getApplicationContext(), MainActivity.class);
-//                                endIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                startActivity(endIntent);
-
                                 mPlayer.start();
-
                             }
                         };
                         timerOn = true;
@@ -282,16 +264,15 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                         lockTicks = 0;
                         changeImage();
                         countDown.start();
-
-
                     }
                 }
             }
 
             // measurement done, save current time for next interval
             timestamp = event.timestamp;
+
         } else if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
-            if(event.values[0] == 0){ //Hand appears over sensor
+            if (event.values[0] == 0) { //Hand appears over sensor
                 if (alarmOn) {
                     mPlayer.stop();
                     alarmOn = false;
@@ -308,8 +289,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                     handOverSensor = true;
                     lockTicks = 0;
                 }
-            }else{ //Hand leaves sensor
-                if(timerOn){
+            } else { //Hand leaves sensor
+                if (timerOn) {
                     handOverSensor = false;
                 }
             }
@@ -332,7 +313,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         lockView.setImageResource(R.drawable.unlock);
     }
 
-    private void hideLock(){
+    private void hideLock() {
         lockView.setVisibility(View.INVISIBLE);
     }
 
@@ -351,6 +332,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         infoGraphics.setImageResource(R.drawable.turn_off);
     }
 
+    //Shows the correct images automatically
     private void changeImage() {
         if (alarmOn) {
             showTurnOffAlarm();
@@ -388,10 +370,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     // Called whenever we need to wake up the device
     public void wakeDevice() {
         fullWakeLock.acquire();
-
-        //KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
-        //KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("TAG");
-        //keyguardLock.disableKeyguard();
     }
 
     //http://stackoverflow.com/questions/6919616/android-how-to-bring-a-task-to-the-foreground/18197545#18197545
@@ -402,7 +380,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     private void speakMinutes(long minutes) {
         String speech = minutes + " minute";
-        if(minutes > 1){
+        if (minutes > 1) {
             speech += "s";
         }
         speech += " and counting";
