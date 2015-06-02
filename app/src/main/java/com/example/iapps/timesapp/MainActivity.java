@@ -304,13 +304,14 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     private void showLock() {
         lockView.setVisibility(View.VISIBLE);
-        lockView.setImageResource(R.drawable.lock);
-        infoGraphics.setImageResource(R.drawable.cover_to_unlock);
+        infoGraphics.setImageResource(R.drawable.lock);
+        lockView.setImageResource(R.drawable.cover_to_unlock_small);
     }
 
     private void showUnlock() {
         lockView.setVisibility(View.VISIBLE);
-        lockView.setImageResource(R.drawable.unlock);
+        infoGraphics.setVisibility(View.VISIBLE);
+        infoGraphics.setImageResource(R.drawable.unlock); //switched places between cover_to_unlock-image and lock-image
     }
 
     private void hideLock() {
@@ -336,10 +337,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private void changeImage() {
         if (alarmOn) {
             showTurnOffAlarm();
+            hideLock();
         } else if (rotationLock) {
             showLock();
         } else if (!rotationLock && timerOn) {
             showUnlock();
+            hideLock(); // hides image cover_to_unlock_small image
         } else if (onTable) {
             hideLock();
             showRotate();
